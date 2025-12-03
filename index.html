@@ -8,7 +8,7 @@
       type="image/png"
       href="https://cdn-icons-png.flaticon.com/512/2951/2951277.png"
     />
-    <title>geojson2bbox</title>
+    <title>geojson2bbox - Overpass Turbo Format</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -47,13 +47,54 @@
         padding: 12px 24px;
         border-radius: 4px;
       }
+      .code-block {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 12px;
+        margin: 8px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .bbox-section {
+        background-color: #f0f7ff;
+        border: 1px solid #c2d9ff;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .bbox-title {
+        color: #0066cc;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .tab-button {
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+      }
+      .tab-button.active {
+        background: #0066cc;
+        color: white;
+        border-color: #0066cc;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
     </style>
   </head>
   <body class="bg-gray-100 font-sans">
-    <div class="max-w-4xl mx-auto p-4">
-      <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
+    <div class="max-w-6xl mx-auto p-4">
+      <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">
         geojson2bbox
       </h1>
+      <p class="text-center text-gray-600 mb-8">Convert GeoJSON to Overpass Turbo Bounding Box Format</p>
 
       <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <div class="mb-4">
@@ -62,83 +103,248 @@
           >
           <textarea
             id="geojson-input"
-            class="w-full p-3 border border-gray-300 rounded-lg"
+            class="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm"
             rows="4"
-            placeholder="Paste your GeoJSON here and press Enter..."
+            placeholder='Paste your GeoJSON here and press Enter...
+            
+Example:
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [98.041992, 2.602864],
+          [98.052979, 2.602864],
+          [98.052979, 2.613839],
+          [98.041992, 2.613839],
+          [98.041992, 2.602864]
+        ]]
+      }
+    }
+  ]
+}'
           ></textarea>
         </div>
 
-        <div class="mb-4 text-sm text-gray-500">
-          <p>
-            Press <strong>Enter</strong> after pasting GeoJSON to display it on
-            the map and calculate the bounding box.
-          </p>
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2"
-            >Upload GeoJSON:</label
-          >
-          <input
-            id="geojson-upload"
-            type="file"
-            accept=".geojson"
-            class="hidden"
-          />
-          <label
-            for="geojson-upload"
-            class="inline-block p-3 border border-gray-300 rounded-lg cursor-pointer text-center bg-white text-gray-700 hover:bg-gray-100"
-          >
-            <span class="material-icons align-middle">file_upload</span> Upload
-            GeoJSON File
-          </label>
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-gray-700 font-semibold mb-2"
-            >Drag and Drop GeoJSON:</label
-          >
-          <div
-            id="drop-area"
-            class="w-full p-6 border-2 border-dashed rounded-lg text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
-          >
-            <span class="material-icons text-4xl text-gray-400"
-              >cloud_upload</span
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="text-center">
+            <button
+              id="load-example"
+              class="w-full p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
             >
-            <p class="text-gray-500">Drag and drop your GeoJSON file here...</p>
+              <span class="material-icons align-middle">article</span>
+              Load Example
+            </button>
+          </div>
+          <div class="text-center">
+            <label
+              for="geojson-upload"
+              class="block w-full p-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 cursor-pointer"
+            >
+              <span class="material-icons align-middle">file_upload</span>
+              Upload File
+              <input
+                id="geojson-upload"
+                type="file"
+                accept=".geojson,.json"
+                class="hidden"
+              />
+            </label>
+          </div>
+          <div class="text-center">
+            <div
+              id="drop-area"
+              class="w-full p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 cursor-pointer"
+            >
+              <span class="material-icons align-middle">cloud_upload</span>
+              Drag & Drop
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Overpass Turbo Configuration -->
       <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold mb-4">Bounding Box</h2>
-        <pre
-          id="bbox-output"
-          class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-gray-800"
-        ></pre>
-        <div class="mb-2 text-sm text-gray-500">
-          <p>
-            Format: [min_x, min_y, max_x, max_y] or [west, south, east, north]
-            or [left, bottom, right, top]
-          </p>
+        <h2 class="text-2xl font-bold mb-4 text-blue-600">
+          <span class="material-icons align-middle">tune</span>
+          Overpass Query Configuration
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-gray-700 font-semibold mb-2">
+              <span class="material-icons align-middle text-sm">calendar_today</span>
+              Filter by Date (UTC)
+            </label>
+            <div class="flex gap-2 mb-2">
+              <button
+                id="date-today"
+                class="flex-1 p-2 bg-gray-100 rounded hover:bg-gray-200 text-sm"
+              >
+                Today
+              </button>
+              <button
+                id="date-yesterday"
+                class="flex-1 p-2 bg-gray-100 rounded hover:bg-gray-200 text-sm"
+              >
+                Yesterday
+              </button>
+              <button
+                id="date-last-week"
+                class="flex-1 p-2 bg-gray-100 rounded hover:bg-gray-200 text-sm"
+              >
+                Last 7 Days
+              </button>
+              <button
+                id="date-custom"
+                class="flex-1 p-2 bg-gray-100 rounded hover:bg-gray-200 text-sm"
+              >
+                Custom
+              </button>
+            </div>
+            <input
+              id="date-input"
+              type="datetime-local"
+              class="w-full p-2 border rounded"
+              value=""
+            />
+            <div class="text-sm text-gray-500 mt-1">
+              <span id="utc-date-display">UTC: --</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-gray-700 font-semibold mb-2">
+              <span class="material-icons align-middle text-sm">layers</span>
+              OSM Element Type
+            </label>
+            <select id="element-type" class="w-full p-2 border rounded">
+              <option value="building">Building</option>
+              <option value="highway">Highway/Road</option>
+              <option value="waterway">Waterway</option>
+              <option value="natural">Natural</option>
+              <option value="landuse">Landuse</option>
+              <option value="amenity">Amenity</option>
+              <option value="shop">Shop</option>
+              <option value="custom">Custom...</option>
+            </select>
+            <input
+              id="custom-element"
+              type="text"
+              class="w-full p-2 border rounded mt-2 hidden"
+              placeholder="Enter custom OSM tag (e.g., building=yes)"
+            />
+          </div>
         </div>
-        <button
-          id="copy-bbox"
-          class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 mb-4"
-        >
-          <span class="material-icons align-middle">content_copy</span> Copy to
-          Clipboard
-        </button>
-        <button
-          id="download-bbox"
-          class="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 mb-4"
-          title="Download BBox as GeoJSON"
-        >
-          <span class="material-icons align-middle">file_download</span>
-          Download
-        </button>
+
+        <!-- BBOX Display -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bbox-section">
+            <div class="bbox-title">
+              <span class="material-icons align-middle text-sm">map</span>
+              Standard BBox Array
+            </div>
+            <div class="text-gray-600 text-sm mb-2">[west, south, east, north]</div>
+            <pre id="bbox-standard" class="code-block">[--, --, --, --]</pre>
+          </div>
+          
+          <div class="bbox-section" style="background-color: #fff0f0; border-color: #ffc2c2;">
+            <div class="bbox-title" style="color: #cc0000;">
+              <span class="material-icons align-middle text-sm">warning</span>
+              Overpass BBox Format
+            </div>
+            <div class="text-gray-600 text-sm mb-2">(south, west, north, east)</div>
+            <pre id="bbox-overpass" class="code-block">(--, --, --, --)</pre>
+            <div class="mt-2 text-sm text-red-600">
+              <span class="material-icons text-sm align-middle">info</span>
+              Use this format in Overpass Turbo queries
+            </div>
+          </div>
+        </div>
+
+        <!-- Query Templates Tabs -->
+        <div class="mt-8">
+          <h3 class="font-bold text-gray-800 mb-4">
+            <span class="material-icons align-middle">code</span>
+            Generated Overpass Queries
+          </h3>
+          
+          <div class="flex border-b mb-4">
+            <button class="tab-button active" data-tab="xml-tab">XML Output</button>
+            <button class="tab-button" data-tab="json-tab">JSON Output</button>
+            <button class="tab-button" data-tab="simple-tab">Simple Version</button>
+          </div>
+          
+          <div id="xml-tab" class="tab-content active">
+            <pre id="overpass-xml" class="code-block bg-gray-800 text-green-100">
+[out:xml][timeout:2500];
+(
+  nwr["building"](newer:"YYYY-MM-DDTHH:MM:SSZ")(south, west, north, east);
+);
+(._;>;);
+out meta;</pre>
+          </div>
+          
+          <div id="json-tab" class="tab-content">
+            <pre id="overpass-json" class="code-block bg-gray-800 text-green-100">
+[out:json][timeout:2500];
+(
+  nwr["building"](newer:"YYYY-MM-DDTHH:MM:SSZ")(south, west, north, east);
+);
+(._;>;);
+out geom;</pre>
+          </div>
+          
+          <div id="simple-tab" class="tab-content">
+            <pre id="overpass-simple" class="code-block bg-gray-800 text-green-100">
+[out:json][timeout:2500];
+nwr["building"](newer:"YYYY-MM-DDTHH:MM:SSZ")(south, west, north, east);
+out geom;</pre>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            id="copy-overpass-bbox"
+            class="bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 flex items-center justify-center"
+          >
+            <span class="material-icons mr-2">content_copy</span>
+            Copy BBox (parentheses)
+          </button>
+          <button
+            id="copy-query-xml"
+            class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 flex items-center justify-center"
+          >
+            <span class="material-icons mr-2">content_copy</span>
+            Copy XML Query
+          </button>
+          <button
+            id="copy-query-json"
+            class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 flex items-center justify-center"
+          >
+            <span class="material-icons mr-2">content_copy</span>
+            Copy JSON Query
+          </button>
+        </div>
+        
+        <div class="mt-4 text-center">
+          <a
+            id="open-overpass"
+            href="#"
+            target="_blank"
+            class="inline-block p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+          >
+            <span class="material-icons mr-2">open_in_new</span>
+            Open in Overpass Turbo
+          </a>
+        </div>
       </div>
 
+      <!-- Map Section -->
       <div
         id="map"
         class="w-full rounded-lg mb-8 border border-gray-300 relative"
@@ -147,7 +353,7 @@
           id="clear-map-button"
           class="bg-red-400 text-white p-2 rounded-lg hover:bg-red-600"
         >
-          Clear
+          Clear Map
         </button>
       </div>
 
@@ -162,6 +368,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.js"></script>
     <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
     <script>
+      // Initialize map
       const style = {
         version: 8,
         sources: {
@@ -172,26 +379,12 @@
             attribution: "&copy; OpenStreetMap Contributors",
             maxzoom: 19,
           },
-          oam: {
-            type: "raster",
-            tiles: [
-              "https://apps.kontur.io/raster-tiler/oam/mosaic/{z}/{x}/{y}.png",
-            ],
-            tileSize: 256,
-            attribution: "&copy; OpenAerialMap Contributors",
-            maxzoom: 19,
-          },
         },
         layers: [
           {
             id: "osm",
             type: "raster",
             source: "osm",
-          },
-          {
-            id: "oam",
-            type: "raster",
-            source: "oam",
           },
         ],
       };
@@ -232,161 +425,291 @@
       });
       map.addControl(draw);
 
-      map.on("draw.create", updateBBox);
-      map.on("draw.update", updateBBox);
+      map.on("draw.create", updateQueries);
+      map.on("draw.update", updateQueries);
 
-      function deleteFeatures() {
+      // Current state
+      let currentBBox = null;
+      let currentDate = new Date().toISOString().split('T')[0] + 'T00:00:00Z';
+      let currentElement = 'building';
+
+      // Initialize date
+      updateDateDisplay();
+
+      // Event Listeners
+      document.getElementById('load-example').addEventListener('click', () => {
+        const exampleGeoJSON = {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                  [98.041992, 2.602864],
+                  [98.052979, 2.602864],
+                  [98.052979, 2.613839],
+                  [98.041992, 2.613839],
+                  [98.041992, 2.602864]
+                ]]
+              }
+            }
+          ]
+        };
+        document.getElementById('geojson-input').value = JSON.stringify(exampleGeoJSON, null, 2);
         draw.deleteAll();
-        document.getElementById("bbox-output").textContent = "";
-        showToast("Features cleared");
-      }
+        draw.add(exampleGeoJSON);
+        calculateBBox(exampleGeoJSON);
+      });
 
-      function updateBBox() {
-        var data = draw.getAll();
-        if (data.features.length > 0) {
-          var bbox = turf.bbox(data);
-          document.getElementById("bbox-output").textContent =
-            JSON.stringify(bbox);
+      document.getElementById('geojson-upload').addEventListener('change', (event) => {
+        var file = event.target.files[0];
+        processFile(file);
+      });
 
-          map.fitBounds([
-            [bbox[0], bbox[1]],
-            [bbox[2], bbox[3]],
-          ]);
-        } else {
-          document.getElementById("bbox-output").textContent = "";
+      document.getElementById('geojson-input').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          processGeoJSONInput();
         }
-      }
-
-      function showToast(message) {
-        var toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.style.display = "block";
-        setTimeout(() => {
-          toast.style.display = "none";
-        }, 3000);
-      }
-
-      var dropArea = document.getElementById("drop-area");
-      dropArea.addEventListener("dragover", (event) => {
-        event.preventDefault();
-        dropArea.classList.add("bg-gray-100");
       });
-      dropArea.addEventListener("dragleave", () => {
-        dropArea.classList.remove("bg-gray-100");
-      });
-      dropArea.addEventListener("drop", (event) => {
+
+      document.getElementById('drop-area').addEventListener('dragover', (event) => {
         event.preventDefault();
-        dropArea.classList.remove("bg-gray-100");
+        event.currentTarget.classList.add('bg-purple-200');
+      });
+
+      document.getElementById('drop-area').addEventListener('dragleave', (event) => {
+        event.currentTarget.classList.remove('bg-purple-200');
+      });
+
+      document.getElementById('drop-area').addEventListener('drop', (event) => {
+        event.preventDefault();
+        event.currentTarget.classList.remove('bg-purple-200');
         var file = event.dataTransfer.files[0];
         processFile(file);
       });
 
-      document
-        .getElementById("geojson-upload")
-        .addEventListener("change", (event) => {
-          var file = event.target.files[0];
-          processFile(file);
-        });
+      // Date buttons
+      document.getElementById('date-today').addEventListener('click', () => {
+        const now = new Date();
+        now.setUTCHours(0, 0, 0, 0);
+        currentDate = now.toISOString().split('.')[0] + 'Z';
+        updateDateDisplay();
+        updateQueries();
+      });
 
-      document
-        .getElementById("geojson-input")
-        .addEventListener("keypress", (event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            var geojsonInput = document.getElementById("geojson-input").value;
-            try {
-              var geojson = JSON.parse(geojsonInput);
-              draw.deleteAll();
-              draw.add(geojson);
-              calculateBBox(geojson);
-            } catch (e) {
-              showToast("Invalid GeoJSON");
-            }
-          }
-        });
+      document.getElementById('date-yesterday').addEventListener('click', () => {
+        const yesterday = new Date();
+        yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+        yesterday.setUTCHours(0, 0, 0, 0);
+        currentDate = yesterday.toISOString().split('.')[0] + 'Z';
+        updateDateDisplay();
+        updateQueries();
+      });
 
+      document.getElementById('date-last-week').addEventListener('click', () => {
+        const lastWeek = new Date();
+        lastWeek.setUTCDate(lastWeek.getUTCDate() - 7);
+        lastWeek.setUTCHours(0, 0, 0, 0);
+        currentDate = lastWeek.toISOString().split('.')[0] + 'Z';
+        updateDateDisplay();
+        updateQueries();
+      });
+
+      document.getElementById('date-custom').addEventListener('click', () => {
+        document.getElementById('date-input').showPicker();
+      });
+
+      document.getElementById('date-input').addEventListener('change', (event) => {
+        if (event.target.value) {
+          const date = new Date(event.target.value + 'Z');
+          currentDate = date.toISOString().split('.')[0] + 'Z';
+          updateDateDisplay();
+          updateQueries();
+        }
+      });
+
+      // Element type selection
+      document.getElementById('element-type').addEventListener('change', (event) => {
+        currentElement = event.target.value;
+        const customInput = document.getElementById('custom-element');
+        if (currentElement === 'custom') {
+          customInput.classList.remove('hidden');
+          customInput.value = '';
+        } else {
+          customInput.classList.add('hidden');
+        }
+        updateQueries();
+      });
+
+      document.getElementById('custom-element').addEventListener('input', (event) => {
+        currentElement = event.target.value;
+        updateQueries();
+      });
+
+      // Tab switching
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          button.classList.add('active');
+          document.getElementById(button.dataset.tab).classList.add('active');
+        });
+      });
+
+      // Copy buttons
+      document.getElementById('copy-overpass-bbox').addEventListener('click', () => {
+        if (currentBBox) {
+          navigator.clipboard.writeText(currentBBox.overpass).then(() => {
+            showToast('Overpass BBox copied to clipboard');
+          });
+        }
+      });
+
+      document.getElementById('copy-query-xml').addEventListener('click', () => {
+        navigator.clipboard.writeText(document.getElementById('overpass-xml').textContent).then(() => {
+          showToast('XML query copied to clipboard');
+        });
+      });
+
+      document.getElementById('copy-query-json').addEventListener('click', () => {
+        navigator.clipboard.writeText(document.getElementById('overpass-json').textContent).then(() => {
+          showToast('JSON query copied to clipboard');
+        });
+      });
+
+      // Open in Overpass Turbo
+      document.getElementById('open-overpass').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = encodeURIComponent(document.getElementById('overpass-xml').textContent);
+          event.target.href = `https://overpass-turbo.eu/?Q=${query}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      document.getElementById('clear-map-button').addEventListener('click', () => {
+        draw.deleteAll();
+        currentBBox = null;
+        document.getElementById('bbox-standard').textContent = '[--, --, --, --]';
+        document.getElementById('bbox-overpass').textContent = '(--, --, --, --)';
+        showToast('Map cleared');
+      });
+
+      // Helper Functions
       function processFile(file) {
         var reader = new FileReader();
         reader.onload = (event) => {
           try {
             var geojson = JSON.parse(event.target.result);
-            document.getElementById("geojson-input").value = JSON.stringify(
-              geojson,
-              null,
-              2
-            );
+            document.getElementById('geojson-input').value = JSON.stringify(geojson, null, 2);
             draw.deleteAll();
             draw.add(geojson);
             calculateBBox(geojson);
           } catch (e) {
-            showToast("Invalid GeoJSON");
+            showToast('Invalid GeoJSON file');
           }
         };
         reader.readAsText(file);
       }
 
+      function processGeoJSONInput() {
+        var geojsonInput = document.getElementById('geojson-input').value;
+        try {
+          var geojson = JSON.parse(geojsonInput);
+          draw.deleteAll();
+          draw.add(geojson);
+          calculateBBox(geojson);
+        } catch (e) {
+          showToast('Invalid GeoJSON');
+        }
+      }
+
       function calculateBBox(geojson) {
         var bbox = turf.bbox(geojson);
-        document.getElementById("bbox-output").textContent =
-          JSON.stringify(bbox);
+        updateBBoxDisplay(bbox);
         map.fitBounds([
           [bbox[0], bbox[1]],
           [bbox[2], bbox[3]],
         ]);
       }
 
-      document.getElementById("copy-bbox").addEventListener("click", () => {
-        var bboxOutput = document.getElementById("bbox-output").textContent;
-        navigator.clipboard.writeText(bboxOutput).then(() => {
-          showToast("BBox copied to clipboard");
-        });
-      });
+      function updateBBoxDisplay(bbox) {
+        // Standard format: [west, south, east, north]
+        const standardBBox = bbox.map(coord => parseFloat(coord.toFixed(6)));
+        document.getElementById('bbox-standard').textContent = JSON.stringify(standardBBox);
+        
+        // Overpass format: (south, west, north, east)
+        const overpassBBox = `(${parseFloat(bbox[1].toFixed(6))}, ${parseFloat(bbox[0].toFixed(6))}, ${parseFloat(bbox[3].toFixed(6))}, ${parseFloat(bbox[2].toFixed(6))})`;
+        document.getElementById('bbox-overpass').textContent = overpassBBox;
+        
+        // Store current bbox
+        currentBBox = {
+          standard: standardBBox,
+          overpass: overpassBBox,
+          values: {
+            south: parseFloat(bbox[1].toFixed(6)),
+            west: parseFloat(bbox[0].toFixed(6)),
+            north: parseFloat(bbox[3].toFixed(6)),
+            east: parseFloat(bbox[2].toFixed(6))
+          }
+        };
+        
+        updateQueries();
+      }
 
-      document.getElementById("download-bbox").addEventListener("click", () => {
-        var bboxOutput = document.getElementById("bbox-output").textContent;
-        if (bboxOutput) {
-          var bboxArray = JSON.parse(bboxOutput);
-          var bboxGeoJSON = {
-            type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                properties: {},
-                geometry: {
-                  type: "Polygon",
-                  coordinates: [
-                    [
-                      [bboxArray[0], bboxArray[1]],
-                      [bboxArray[2], bboxArray[1]],
-                      [bboxArray[2], bboxArray[3]],
-                      [bboxArray[0], bboxArray[3]],
-                      [bboxArray[0], bboxArray[1]],
-                    ],
-                  ],
-                },
-              },
-            ],
-          };
-          var blob = new Blob([JSON.stringify(bboxGeoJSON)], {
-            type: "application/json",
-          });
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = "bbox.geojson";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          showToast("BBox downloaded as GeoJSON");
-        } else {
-          showToast("No BBox to download");
-        }
-      });
+      function updateDateDisplay() {
+        document.getElementById('utc-date-display').textContent = `UTC: ${currentDate}`;
+        const localDate = new Date(currentDate).toLocaleString();
+        document.getElementById('date-input').value = currentDate.replace('Z', '').replace('T', ' ');
+      }
 
-      document
-        .getElementById("clear-map-button")
-        .addEventListener("click", deleteFeatures);
+      function updateQueries() {
+        if (!currentBBox) return;
+        
+        const element = currentElement === 'custom' ? 
+          document.getElementById('custom-element').value : currentElement;
+        
+        // XML version
+        const xmlQuery = `[out:xml][timeout:2500];
+(
+  nwr["${element}"](newer:"${currentDate}")${currentBBox.overpass};
+);
+(._;>;);
+out meta;`;
+        document.getElementById('overpass-xml').textContent = xmlQuery;
+        
+        // JSON version
+        const jsonQuery = `[out:json][timeout:2500];
+(
+  nwr["${element}"](newer:"${currentDate}")${currentBBox.overpass};
+);
+(._;>;);
+out geom;`;
+        document.getElementById('overpass-json').textContent = jsonQuery;
+        
+        // Simple version
+        const simpleQuery = `[out:json][timeout:2500];
+nwr["${element}"](newer:"${currentDate}")${currentBBox.overpass};
+out geom;`;
+        document.getElementById('overpass-simple').textContent = simpleQuery;
+      }
+
+      function showToast(message) {
+        var toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 3000);
+      }
+
+      // Initialize with example
+      setTimeout(() => {
+        document.getElementById('load-example').click();
+      }, 500);
     </script>
   </body>
 </html>
