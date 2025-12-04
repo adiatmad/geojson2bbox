@@ -57,6 +57,7 @@
         font-size: 14px;
         white-space: pre-wrap;
         word-wrap: break-word;
+        position: relative;
       }
       .bbox-section {
         background-color: #f0f7ff;
@@ -87,6 +88,66 @@
       .tab-content.active {
         display: block;
       }
+      .info-box {
+        background-color: #f8f9fa;
+        border-left: 4px solid #0066cc;
+        padding: 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .feature-list {
+        list-style-type: none;
+        padding-left: 0;
+      }
+      .feature-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+      .material-icons.feature-icon {
+        color: #0066cc;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .tm-input-section {
+        background-color: #f0fff4;
+        border: 1px solid #c6f6d5;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .tm-input-title {
+        color: #2f855a;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .query-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .open-in-overpass-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        background-color: #ff6b00;
+        color: white;
+        border-radius: 4px;
+        font-size: 12px;
+        text-decoration: none;
+        transition: background-color 0.2s;
+      }
+      .open-in-overpass-btn:hover {
+        background-color: #e55a00;
+      }
+      .overpass-action-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
     </style>
   </head>
   <body class="bg-gray-100 font-sans">
@@ -95,6 +156,118 @@
         geojson2bbox
       </h1>
       <p class="text-center text-gray-600 mb-8">Convert GeoJSON to Overpass Turbo Bounding Box Format</p>
+
+      <!-- Tool Information Section -->
+      <div class="info-box mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">
+          <span class="material-icons align-middle">info</span>
+          About This Tool
+        </h2>
+        <p class="mb-3">
+          This tool helps you check the latest OSM data mapped using Tasking Manager projects via Overpass Turbo.
+        </p>
+        
+        <h3 class="font-bold text-gray-700 mt-4 mb-2">
+          <span class="material-icons feature-icon text-sm">compare</span>
+          Key Differences from Tasking Manager Download
+        </h3>
+        <ul class="feature-list text-gray-600">
+          <li>
+            <span class="material-icons feature-icon text-sm">download</span>
+            <strong>TM Download:</strong> Gets all objects within the project area
+          </li>
+          <li>
+            <span class="material-icons feature-icon text-sm">tune</span>
+            <strong>This Tool:</strong> Allows custom filtering and modifications for specific needs
+          </li>
+        </ul>
+
+        <h3 class="font-bold text-gray-700 mt-4 mb-2">
+          <span class="material-icons feature-icon text-sm">check_circle</span>
+          Tool Features
+        </h3>
+        <ul class="feature-list text-gray-600">
+          <li>
+            <span class="material-icons feature-icon text-sm">grid_on</span>
+            Extract GeoJSON grids from Tasking Manager projects to determine BBOX
+          </li>
+          <li>
+            <span class="material-icons feature-icon text-sm">filter_list</span>
+            Select specific parameters (e.g., buildings only, roads, waterways)
+          </li>
+          <li>
+            <span class="material-icons feature-icon text-sm">schedule</span>
+            Set time filters to get objects mapped in OSM after a specific date
+          </li>
+          <li>
+            <span class="material-icons feature-icon text-sm">code</span>
+            Choose between JSON or XML output formats
+          </li>
+          <li>
+            <span class="material-icons feature-icon text-sm">open_in_new</span>
+            Copy generated queries and open directly in Overpass Turbo
+          </li>
+        </ul>
+
+        <h3 class="font-bold text-gray-700 mt-4 mb-2">
+          <span class="material-icons feature-icon text-sm">map</span>
+          Typical Workflow
+        </h3>
+        <ol class="list-decimal pl-5 text-gray-600 space-y-1">
+          <li>Get GeoJSON grid from your Tasking Manager project using the download link below</li>
+          <li>Paste/upload it here to calculate the Bounding Box (BBOX)</li>
+          <li>Configure filters (date, element type, etc.)</li>
+          <li>Generate Overpass Turbo query</li>
+          <li>Copy and run in Overpass Turbo to verify recent mapping</li>
+        </ol>
+      </div>
+
+      <!-- Tasking Manager Download Section (Simplified) -->
+      <div class="tm-input-section mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-3">
+          <span class="material-icons align-middle">get_app</span>
+          Download AOI from Tasking Manager
+        </h2>
+        <p class="text-gray-600 mb-4">
+          Get GeoJSON from any Tasking Manager project. Just replace <code>PROJECT_ID</code> with your project number in this URL:
+        </p>
+        
+        <div class="mb-4">
+          <div class="code-block mb-2">
+https://tasking-manager-production-api.hotosm.org/api/v2/projects/<strong>[PROJECT_ID]</strong>/queries/aoi/?as_file=true
+          </div>
+          <p class="text-sm text-gray-600">
+            Example for project 36867: 
+            <a href="https://tasking-manager-production-api.hotosm.org/api/v2/projects/36867/queries/aoi/?as_file=true" 
+               target="_blank"
+               class="text-blue-600 hover:underline">
+              https://tasking-manager-production-api.hotosm.org/api/v2/projects/36867/queries/aoi/?as_file=true
+            </a>
+          </p>
+        </div>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <h4 class="font-bold text-blue-800 mb-2">
+            <span class="material-icons align-middle text-sm">help</span>
+            How to use:
+          </h4>
+          <ol class="list-decimal pl-5 text-blue-700 space-y-1">
+            <li>Replace <code>PROJECT_ID</code> with your project number (found in the project URL)</li>
+            <li>Open the URL in your browser</li>
+            <li>Save the GeoJSON file</li>
+            <li>Upload it below using "Upload File" or copy-paste the content</li>
+          </ol>
+        </div>
+        
+        <div class="text-center">
+          <a href="https://tasking-manager-production-api.hotosm.org/api/v2/projects/36867/queries/aoi/?as_file=true"
+             target="_blank"
+             class="inline-flex items-center p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
+            <span class="material-icons mr-2">open_in_new</span>
+            Open Example Project (36867)
+          </a>
+        </div>
+      </div>
 
       <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
         <div class="mb-4">
@@ -267,10 +440,26 @@ Example:
 
         <!-- Query Templates Tabs -->
         <div class="mt-8">
-          <h3 class="font-bold text-gray-800 mb-4">
-            <span class="material-icons align-middle">code</span>
-            Generated Overpass Queries
-          </h3>
+          <div class="query-header">
+            <h3 class="font-bold text-gray-800">
+              <span class="material-icons align-middle">code</span>
+              Generated Overpass Queries
+            </h3>
+            <div>
+              <a id="open-overpass-xml" href="#" target="_blank" class="open-in-overpass-btn" style="display: none;">
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open XML Query
+              </a>
+              <a id="open-overpass-json" href="#" target="_blank" class="open-in-overpass-btn" style="display: none;">
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open JSON Query
+              </a>
+              <a id="open-overpass-simple" href="#" target="_blank" class="open-in-overpass-btn" style="display: none;">
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open Simple Query
+              </a>
+            </div>
+          </div>
           
           <div class="flex border-b mb-4">
             <button class="tab-button active" data-tab="xml-tab">XML Output</button>
@@ -286,6 +475,24 @@ Example:
 );
 (._;>;);
 out meta;</pre>
+            <div class="overpass-action-buttons">
+              <button
+                id="copy-query-xml"
+                class="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">content_copy</span>
+                Copy XML Query
+              </button>
+              <a
+                id="open-overpass-tab-xml"
+                href="#"
+                target="_blank"
+                class="flex-1 bg-orange-500 text-white p-2 rounded hover:bg-orange-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open in Overpass Turbo
+              </a>
+            </div>
           </div>
           
           <div id="json-tab" class="tab-content">
@@ -296,6 +503,24 @@ out meta;</pre>
 );
 (._;>;);
 out geom;</pre>
+            <div class="overpass-action-buttons">
+              <button
+                id="copy-query-json"
+                class="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">content_copy</span>
+                Copy JSON Query
+              </button>
+              <a
+                id="open-overpass-tab-json"
+                href="#"
+                target="_blank"
+                class="flex-1 bg-orange-500 text-white p-2 rounded hover:bg-orange-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open in Overpass Turbo
+              </a>
+            </div>
           </div>
           
           <div id="simple-tab" class="tab-content">
@@ -303,6 +528,24 @@ out geom;</pre>
 [out:json][timeout:2500];
 nwr["building"](newer:"YYYY-MM-DDTHH:MM:SSZ")(south, west, north, east);
 out geom;</pre>
+            <div class="overpass-action-buttons">
+              <button
+                id="copy-query-simple"
+                class="flex-1 bg-purple-500 text-white p-2 rounded hover:bg-purple-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">content_copy</span>
+                Copy Simple Query
+              </button>
+              <a
+                id="open-overpass-tab-simple"
+                href="#"
+                target="_blank"
+                class="flex-1 bg-orange-500 text-white p-2 rounded hover:bg-orange-600 flex items-center justify-center text-sm"
+              >
+                <span class="material-icons mr-1 text-sm">open_in_new</span>
+                Open in Overpass Turbo
+              </a>
+            </div>
           </div>
         </div>
 
@@ -316,30 +559,20 @@ out geom;</pre>
             Copy BBox (parentheses)
           </button>
           <button
-            id="copy-query-xml"
-            class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 flex items-center justify-center"
+            id="copy-all-queries"
+            class="bg-indigo-500 text-white p-3 rounded-lg hover:bg-indigo-600 flex items-center justify-center"
           >
             <span class="material-icons mr-2">content_copy</span>
-            Copy XML Query
+            Copy All Queries
           </button>
-          <button
-            id="copy-query-json"
-            class="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 flex items-center justify-center"
-          >
-            <span class="material-icons mr-2">content_copy</span>
-            Copy JSON Query
-          </button>
-        </div>
-        
-        <div class="mt-4 text-center">
           <a
-            id="open-overpass"
+            id="open-all-overpass"
             href="#"
             target="_blank"
-            class="inline-block p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+            class="bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 flex items-center justify-center"
           >
             <span class="material-icons mr-2">open_in_new</span>
-            Open in Overpass Turbo
+            Open All in Overpass
           </a>
         </div>
       </div>
@@ -436,7 +669,7 @@ out geom;</pre>
       // Initialize date
       updateDateDisplay();
 
-      // Event Listeners
+      // Event Listeners for existing functionality
       document.getElementById('load-example').addEventListener('click', () => {
         const exampleGeoJSON = {
           "type": "FeatureCollection",
@@ -554,7 +787,11 @@ out geom;</pre>
           document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
           document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
           button.classList.add('active');
-          document.getElementById(button.dataset.tab).classList.add('active');
+          const tabId = button.dataset.tab;
+          document.getElementById(tabId).classList.add('active');
+          
+          // Update header buttons visibility
+          updateHeaderButtons();
         });
       });
 
@@ -568,22 +805,145 @@ out geom;</pre>
       });
 
       document.getElementById('copy-query-xml').addEventListener('click', () => {
-        navigator.clipboard.writeText(document.getElementById('overpass-xml').textContent).then(() => {
+        const query = document.getElementById('overpass-xml').textContent;
+        navigator.clipboard.writeText(query).then(() => {
           showToast('XML query copied to clipboard');
         });
       });
 
       document.getElementById('copy-query-json').addEventListener('click', () => {
-        navigator.clipboard.writeText(document.getElementById('overpass-json').textContent).then(() => {
+        const query = document.getElementById('overpass-json').textContent;
+        navigator.clipboard.writeText(query).then(() => {
           showToast('JSON query copied to clipboard');
         });
       });
 
-      // Open in Overpass Turbo
-      document.getElementById('open-overpass').addEventListener('click', (event) => {
+      document.getElementById('copy-query-simple').addEventListener('click', () => {
+        const query = document.getElementById('overpass-simple').textContent;
+        navigator.clipboard.writeText(query).then(() => {
+          showToast('Simple query copied to clipboard');
+        });
+      });
+
+      // Copy all queries
+      document.getElementById('copy-all-queries').addEventListener('click', () => {
+        const xmlQuery = document.getElementById('overpass-xml').textContent;
+        const jsonQuery = document.getElementById('overpass-json').textContent;
+        const simpleQuery = document.getElementById('overpass-simple').textContent;
+        
+        const allQueries = `=== XML Query ===\n${xmlQuery}\n\n=== JSON Query ===\n${jsonQuery}\n\n=== Simple Query ===\n${simpleQuery}`;
+        
+        navigator.clipboard.writeText(allQueries).then(() => {
+          showToast('All queries copied to clipboard');
+        });
+      });
+
+      // Open in Overpass Turbo buttons
+      document.getElementById('open-overpass-tab-xml').addEventListener('click', (event) => {
         if (currentBBox) {
-          const query = encodeURIComponent(document.getElementById('overpass-xml').textContent);
-          event.target.href = `https://overpass-turbo.eu/?Q=${query}`;
+          const query = document.getElementById('overpass-xml').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      document.getElementById('open-overpass-tab-json').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = document.getElementById('overpass-json').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      document.getElementById('open-overpass-tab-simple').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = document.getElementById('overpass-simple').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      // Open all in Overpass
+      document.getElementById('open-all-overpass').addEventListener('click', (event) => {
+        if (currentBBox) {
+          // Open XML query in main tab
+          const xmlQuery = document.getElementById('overpass-xml').textContent;
+          const encodedQuery = encodeURIComponent(xmlQuery);
+          window.open(`https://overpass-turbo.eu/?Q=${encodedQuery}`, '_blank');
+          
+          // Open JSON query in new tab
+          const jsonQuery = document.getElementById('overpass-json').textContent;
+          const encodedJsonQuery = encodeURIComponent(jsonQuery);
+          window.open(`https://overpass-turbo.eu/?Q=${encodedJsonQuery}`, '_blank');
+          
+          // Open simple query in new tab
+          const simpleQuery = document.getElementById('overpass-simple').textContent;
+          const encodedSimpleQuery = encodeURIComponent(simpleQuery);
+          window.open(`https://overpass-turbo.eu/?Q=${encodedSimpleQuery}`, '_blank');
+          
+          showToast('Opening all queries in Overpass Turbo');
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      // Update header buttons
+      function updateHeaderButtons() {
+        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+        
+        // Hide all header buttons first
+        document.getElementById('open-overpass-xml').style.display = 'none';
+        document.getElementById('open-overpass-json').style.display = 'none';
+        document.getElementById('open-overpass-simple').style.display = 'none';
+        
+        // Show the active one
+        if (activeTab === 'xml-tab') {
+          document.getElementById('open-overpass-xml').style.display = 'inline-flex';
+        } else if (activeTab === 'json-tab') {
+          document.getElementById('open-overpass-json').style.display = 'inline-flex';
+        } else if (activeTab === 'simple-tab') {
+          document.getElementById('open-overpass-simple').style.display = 'inline-flex';
+        }
+      }
+
+      // Set up header button click events
+      document.getElementById('open-overpass-xml').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = document.getElementById('overpass-xml').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      document.getElementById('open-overpass-json').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = document.getElementById('overpass-json').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
+        } else {
+          event.preventDefault();
+          showToast('No bounding box defined');
+        }
+      });
+
+      document.getElementById('open-overpass-simple').addEventListener('click', (event) => {
+        if (currentBBox) {
+          const query = document.getElementById('overpass-simple').textContent;
+          const encodedQuery = encodeURIComponent(query);
+          event.target.href = `https://overpass-turbo.eu/?Q=${encodedQuery}`;
         } else {
           event.preventDefault();
           showToast('No bounding box defined');
@@ -695,6 +1055,9 @@ out geom;`;
 nwr["${element}"](newer:"${currentDate}")${currentBBox.overpass};
 out geom;`;
         document.getElementById('overpass-simple').textContent = simpleQuery;
+        
+        // Update header buttons visibility
+        updateHeaderButtons();
       }
 
       function showToast(message) {
@@ -709,6 +1072,7 @@ out geom;`;
       // Initialize with example
       setTimeout(() => {
         document.getElementById('load-example').click();
+        updateHeaderButtons();
       }, 500);
     </script>
   </body>
